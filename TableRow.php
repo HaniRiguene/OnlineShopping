@@ -9,14 +9,13 @@
 namespace Dompdf\Positioner;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Table;
 
 /**
- * Positions table cells
+ * Positions table rows
  *
  * @package dompdf
  */
-class TableCell extends AbstractPositioner
+class TableRow extends AbstractPositioner
 {
 
     /**
@@ -24,8 +23,14 @@ class TableCell extends AbstractPositioner
      */
     function position(AbstractFrameDecorator $frame)
     {
-        $table = Table::find_parent_table($frame);
-        $cellmap = $table->get_cellmap();
-        $frame->set_position($cellmap->get_frame_position($frame));
+        $cb = $frame->get_containing_block();
+        $p = $frame->get_prev_sibling();
+
+        if ($p) {
+            $y = $p->get_position("y") + $p->get_margin_height();
+        } else {
+            $y = $cb["y"];
+        }
+        $frame->set_position($cb["x"], $y);
     }
 }
